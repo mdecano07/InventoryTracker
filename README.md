@@ -20,6 +20,7 @@ To run this project
 ## System Design
 
 * The models used are Item, Loan, User which represents the core entities in the system.
+
 1. Item represents library items, including their unique IDs, types (e.g., book, DVD), and titles which is based on the
    csv input file.
 2. Loan represents loan records, indicating the user, the item they borrowed, and the loan start date.
@@ -29,6 +30,7 @@ To run this project
 3. User represents information about library users.
 
 * The functionalities of the application is split into 3 different services:
+
 1. Data Service
     * This is the data layer of the application. It's primary responsibility is to manage the data, from initialising
       the models and provide interaction to update the data.
