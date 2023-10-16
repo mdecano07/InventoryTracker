@@ -48,9 +48,9 @@ To run this project
 
 1. Loading and managing the library's inventory data from CSV files is only done one time during application start-up.
 2. The system assumes the CSV file is accurate and up-to-date with limited data validation performed.
-3. No security layer is implemented to restric access to the application to specific users.
+3. No security layer is implemented to restrict access to the application to specific users.
 4. As user and loan data are in memory - there is no data back-up and recovery plan.
-5. Item Uniquness is assumed - no data handling on duplicate items.
+5. Item uniqueness is assumed - no data handling on duplicate items.
 6. User is not able to interact with the application - in the future, APIs can be exposed for access to the services.
 7. Application assumes that there is only one data source. Other data sources such as a database will have to be
    implemented.
