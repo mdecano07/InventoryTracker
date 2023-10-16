@@ -39,7 +39,6 @@ public class LoanServiceTest {
         // THEN
         // Verify that the DataService's removeLoanData was called with the loan to return
         Mockito.verify(dataService).removeLoanData(loanToReturn);
-        //TODO Check if loan data size is reduced by 1
     }
 
 }
