@@ -12,11 +12,8 @@ public class Item {
 
     @NonNull
     private Integer uniqueItemId;
-
     private int itemId;
-
     private String type;
-
     private String title;
 
 }

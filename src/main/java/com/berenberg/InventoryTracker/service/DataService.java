@@ -25,11 +25,17 @@ public class DataService {
     private final Map<Integer, Item> inventoryData;
     @Getter
     private final List<Loan> loanData = new ArrayList<>();
+    @Getter
     private final Map<Integer, User> userData = new HashMap<>();
 
     public DataService(CsvReader csvReader) {
         this.csvReader = csvReader;
         this.inventoryData = initialiseInventoryData();
+
+        // Initialise userData with dummy data
+        userData.put(1, new User(1, "John", " Doe", "john.doe@gmail.com"));
+        userData.put(2, new User(2, "Alice", "Smith", "alice.smith@gmail.com"));
+        userData.put(3, new User(3, "Bob", " Johnson", "bob.johnson@gmail.com"));
     }
 
     private Map<Integer, Item> initialiseInventoryData() {

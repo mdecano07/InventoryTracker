@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -17,14 +16,15 @@ public class InventoryService {
     private DataService dataService;
 
     private List<String> getCurrentInventory() {
-        var inventoryData = dataService.getInventoryData();
+        final var inventoryData = dataService.getInventoryData();
 
-        // Get the item IDs that are currently on loan
-        var loanedItemIds = dataService.getLoanData()
+        //get the uniqueItemIds that are currently on loan
+        final var loanedItemIds = dataService.getLoanData()
                 .stream()
                 .map(Loan::getUniqueItemId)
                 .collect(Collectors.toList());
 
+        //return the items in the inventory data where the uniqueItemId is not in the loan data
         return inventoryData.values()
                 .stream()
                 .filter(item -> !loanedItemIds.contains(item.getUniqueItemId()))
@@ -32,37 +32,41 @@ public class InventoryService {
                 .collect(Collectors.toList());
     }
 
-    private boolean isItemAvailable(String title) {
-        //get all the items unique id associated with the title
-        // check if the unique ids are in the loans
-        var itemIds = dataService.getInventoryData().entrySet()
+    private boolean isTitleAvailable(String title) {
+        //get the title's uniqueItemIds in the inventory
+        final var inventoryIds = dataService.getInventoryData().values()
                 .stream()
-                .filter(entry -> title.equals(entry.getValue().getTitle()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .filter(item -> title.equals(item.getTitle()))
+                .map(Item::getUniqueItemId)
+                .collect(Collectors.toSet());
 
-        // Check if the unique IDs are in the loans
-        var loanedItemIds = dataService.getLoanData()
+        //get the uniqueItemIds in the loans
+        final var loanedIds = dataService.getLoanData()
                 .stream()
                 .map(Loan::getUniqueItemId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        // Check if any of the item IDs are in the loans
-        return itemIds.stream().anyMatch(loanedItemIds::contains);
+        //count uniqueItemIds in the inventory are in the loans
+        final double countOfUniqueItemsInLoans = inventoryIds.stream()
+                .filter(loanedIds::contains)
+                .count();
+
+        //the number of ids in loan data should always be less than the inventory for an available item
+        return countOfUniqueItemsInLoans < inventoryIds.size();
     }
 
     public List<String> getOverdueItems() {
-        var sevenDaysAgo = LocalDate.now().minusDays(7);
+        final var sevenDaysAgo = LocalDate.now().minusDays(7);
 
-        // Get all the uniqueItemsId that are overdue
-        var overdueItemIds = dataService.getLoanData()
+        //get the uniqueItemIds that are overdue
+        final var overdueItemIds = dataService.getLoanData()
                 .stream()
                 .filter(loan -> loan.getLoanStartDate().isBefore(sevenDaysAgo))
                 .map(Loan::getUniqueItemId)
                 .collect(Collectors.toList());
 
-        // Look up those IDs in the inventory
-        var inventoryData = dataService.getInventoryData();
+        //look up those uniqueItemIds in the inventory
+        final var inventoryData = dataService.getInventoryData();
         return overdueItemIds.stream()
                 .map(inventoryData::get)
                 .filter(Objects::nonNull)
@@ -71,22 +75,24 @@ public class InventoryService {
     }
 
     public List<Item> getUserItems(Integer userId) {
-        //go to loans and get itemid for this user
-        //look for the
-
-        var userItemIds = dataService.getLoanData()
+        //get loan data for user
+        final var loanDataForUser = dataService.getLoanData()
                 .stream()
-                .map(Loan::getUserId)
-                .filter(userId::equals)
+                .filter(loan -> userId.equals(loan.getUserId()))
                 .collect(Collectors.toList());
 
-        // Look up those IDs in the inventory
-        var inventoryData = dataService.getInventoryData();
-        return userItemIds.stream()
+        //get uniqueItemIds for the user
+        final var userUniqueItemIds = loanDataForUser
+                .stream()
+                .map(Loan::getUniqueItemId)
+                .collect(Collectors.toList());
+
+        //look up items associated with the uniqueItemIds
+        final var inventoryData = dataService.getInventoryData();
+        return userUniqueItemIds.stream()
                 .map(inventoryData::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
     }
 
 }
